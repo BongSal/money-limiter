@@ -7,9 +7,8 @@ export const useCategoryStore = defineStore("category", () => {
     JSON.parse(localStorage.getItem("categories") || "[]")
   );
   const create = (category: Category) => {
-    console.log({category})
     category.id = Date.now();
-    categories.value.push(category);
+    categories.value.push(JSON.parse(JSON.stringify(category)));
   };
   const remove = (id: number) => {
     categories.value = categories.value.filter((item) => item.id !== id);

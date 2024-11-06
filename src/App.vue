@@ -23,64 +23,15 @@
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3 mb-6" v-else>
-          <Card
+          <CardCategory
             v-for="(category, index) in categories"
             :key="index"
+            @edit="handleEditCategoryClick"
+            @delete="deleteCategory"
+            :category="category"
             variant="outline"
             class="border rounded-xl"
-          >
-            <CardContent class="p-4">
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-medium">{{ category.name }}</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger as="div">
-                    <Button variant="ghost" size="icon" class="h-6 w-6">
-                      <ChevronDownIcon class="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      @click="handleEditCategoryClick(category)"
-                    >
-                      <PencilSquareIcon class="w-4 h-4 mr-2" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      @click="deleteCategory(index)"
-                      class="text-red-600 focus:text-red-600"
-                    >
-                      <TrashIcon class="w-4 h-4 mr-2" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <div class="text-xs text-muted-foreground mb-1">
-                Limited: {{ category.limit }}
-              </div>
-              <div class="flex justify-between items-center">
-                <div class="text-xs">
-                  Spent:
-                  {{
-                    category.items.reduce((sum, item) => sum + item.amount, 0)
-                  }}
-                </div>
-                <Badge
-                  v-if="
-                    category.items.reduce((sum, item) => sum + item.amount, 0) >
-                    category.limit
-                  "
-                  variant="destructive"
-                  class="text-xs"
-                >
-                  Exceed
-                </Badge>
-                <Badge v-else variant="secondary" class="text-xs">
-                  Active
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
+          />
         </div>
       </div>
 
@@ -150,11 +101,15 @@
           </form>
         </div>
         <DialogFooter class="flex-row gap-2">
-          <Button class="flex-1" variant="outline" @click="closeEditDialog">
+          <Button
+            class="flex-1"
+            variant="outline"
+            @click="isEditDialogOpen = false"
+          >
             Cancel
           </Button>
           <Button class="flex-1" @click="handleEditCategory">
-            Save changes
+            Save
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -166,7 +121,8 @@
         <DialogHeader>
           <DialogTitle>Add Category</DialogTitle>
           <DialogDescription>
-            Make changes to the category details here.
+            The Category feature is used to manage daily expenses and item
+            spending effectively.
           </DialogDescription>
         </DialogHeader>
         <div class="py-4">
@@ -219,7 +175,7 @@
             Cancel
           </Button>
           <Button class="flex-1" @click="handleAddCategory">
-            Save changes
+            Save
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -285,8 +241,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "./components/ui/card";
 import { Input } from "./components/ui/input";
 import { Label } from "./components/ui/label";
 import { Button } from "./components/ui/button";
-import { Badge } from "./components/ui/badge";
 import { Empty } from "./components/icons/empty";
+import { Category as CardCategory } from "./components/card/category";
 import {
   Dialog,
   DialogContent,
@@ -342,14 +298,6 @@ const categoryModel = reactive<Category>({
   limit: 0,
   items: [],
 });
-const resetModel = () => {
-  Object.assign(categoryModel, {
-    id: 0,
-    name: "",
-    limit: 0,
-    items: [],
-  });
-};
 const handleAddCategory = handleSubmit(() => {
   create(categoryModel);
   isAddDialogOpen.value = false;
@@ -361,14 +309,10 @@ const handleEditCategoryClick = (category: Category) => {
   setValues(categoryModel);
   isEditDialogOpen.value = true;
 };
-const handleEditCategory = handleSubmit(() => {
-  update(categoryModel.id, categoryModel);
+const handleEditCategory = handleSubmit((values) => {
+  update(categoryModel.id, values);
   isEditDialogOpen.value = false;
 });
-const closeEditDialog = () => {
-  isEditDialogOpen.value = false;
-  resetModel();
-};
 
 const isDeleteDialogOpen = ref(false);
 const deleteIndex = ref<number>(0);
@@ -381,7 +325,7 @@ const isClearDialogOpen = ref(false);
 const confirmDelete = () => {
   if (deleteIndex.value !== null) {
     categories.value = categories.value.filter(
-      (_, index) => index !== deleteIndex.value
+      (item) => item.id != deleteIndex.value
     );
   }
   isDeleteDialogOpen.value = false;
@@ -390,5 +334,6 @@ const confirmDelete = () => {
 
 const clearItems = () => {
   categories.value = [];
+  isClearDialogOpen.value = false
 };
 </script>
