@@ -8,10 +8,10 @@
       <span class="text-sm text-muted-foreground">{{ currentDate() }}</span>
     </CardHeader>
 
-    <CardContent class="pb-4 flex flex-col" style="height: calc(100vh - 68px)">
+    <CardContent class="pb-4 flex flex-col" style="height: calc(100dvh - 68px)">
       <div
         class="flex-1 overflow-auto"
-        style="height: calc(100vh - (68px + 36px))"
+        style="height: calc(100dvh - (68px + 36px))"
       >
         <div
           v-if="!categories.length"
@@ -32,7 +32,8 @@
         <div v-else>
           <draggable
             v-model="categories"
-            @end="onEnd"
+            :delay="200"
+            :delay-on-touch-only="true"
             class="grid grid-cols-2 gap-3"
             item-key="id"
           >
@@ -348,5 +349,4 @@ const currentDate = () => {
     hour12: true,
   }).format(today);
 };
-const onEnd = () => {};
 </script>
