@@ -9,7 +9,10 @@
     </CardHeader>
 
     <CardContent class="pb-4 flex flex-col" style="height: calc(100vh - 68px)">
-      <div class="flex-1">
+      <div
+        class="flex-1 overflow-auto"
+        style="height: calc(100vh - (68px + 36px))"
+      >
         <div
           v-if="!categories.length"
           class="flex h-full text-center justify-center items-center"
@@ -18,7 +21,12 @@
             <div class="inline-block">
               <DocumentMagnifyingGlassIcon class="w-16" />
             </div>
-            <p class="text-sm">There are no categories to display right now.</p>
+            <p class="text-sm mb-2">
+              There are no categories to display right now.
+            </p>
+            <Button variant="outline" @click="initSampleCategories()">
+              Create sample categories
+            </Button>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3 mb-6" v-else>
@@ -268,7 +276,7 @@ const validationSchema = toTypedSchema(
   })
 );
 const { isFieldDirty, handleSubmit, setValues } = useForm({ validationSchema });
-const { create, update } = useCategoryStore();
+const { create, update, initSampleCategories } = useCategoryStore();
 const { categories } = storeToRefs(useCategoryStore());
 
 const isAddDialogOpen = ref(false);
@@ -282,7 +290,7 @@ const handleAddCategory = handleSubmit((values) => {
   const category: Partial<Category> = {
     ...values,
     items: [],
-  }
+  };
   create(category);
   isAddDialogOpen.value = false;
 });

@@ -23,6 +23,29 @@ export const useCategoryStore = defineStore("category", () => {
     }
   };
 
+  const initSampleCategories = () => {
+    const expenseCategories = [
+      "Food & Groceries",
+      "Transportation",
+      "Housing",
+      "Personal Care",
+      "Health & Wellness",
+      "Entertainment & Leisure",
+      "Dining Out",
+      "Clothing & Accessories",
+      "Education & Learning",
+      "Household Supplies",
+      "Miscellaneous",
+    ];
+    const defaultCategories: Array<Category> = expenseCategories.map((item) => ({
+      id: Date.now(),
+      name: item,
+      items: [],
+      limit: 10000,
+    }))
+    categories.value = defaultCategories
+  };
+
   watch(
     categories,
     (newCategories) => {
@@ -31,5 +54,5 @@ export const useCategoryStore = defineStore("category", () => {
     { deep: true }
   );
 
-  return { categories, create, remove, update };
+  return { categories, create, remove, update, initSampleCategories };
 });
