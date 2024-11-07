@@ -1,5 +1,13 @@
 <template>
-  <Card variant="outline" class="border rounded-xl">
+  <Card
+    variant="outline"
+    class="border rounded-xl transition duration-200 transform hover:cursor-pointer"
+    @mousedown="isPressed = true"
+    :class="{ 'scale-95': isPressed }"
+    @mouseup="isPressed = false"
+    @mouseleave="isPressed = false"
+    @click="handleCardClick"
+  >
     <CardContent class="p-4">
       <div class="flex justify-between items-center mb-2">
         <span class="text-sm font-medium">{{ category.name }}</span>
@@ -10,6 +18,10 @@
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            <DropdownMenuItem @click="isAddItemDialogOpen = true">
+              <ClipboardDocumentIcon class="w-4 h-4 mr-2" />
+              Add Item
+            </DropdownMenuItem>
             <DropdownMenuItem @click="$emit('edit', category)">
               <PencilSquareIcon class="w-4 h-4 mr-2" />
               Edit
@@ -45,12 +57,78 @@
         <Badge v-else variant="secondary" class="text-xs"> Active </Badge>
       </div>
     </CardContent>
+
+    <Dialog
+      :open="isAddItemDialogOpen"
+      @update:open="isAddItemDialogOpen = $event"
+    >
+      <DialogContent class="max-w-[360px] sm:max-w-[360px]">
+        <DialogHeader>
+          <DialogTitle> Add Item to {{ category.name }} </DialogTitle>
+          <DialogDescription>
+            The Category feature is used to manage daily expenses and item
+            spending effectively.
+          </DialogDescription>
+        </DialogHeader>
+        <div class="py-4">
+          <form @submit="handleAddItem" class="grid gap-4">
+            <FormField
+              v-slot="{ componentField }"
+              name="name"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormControl>
+                  <Label for="name">Name</Label>
+                  <Input
+                    v-model="itemModel.name"
+                    placeholder="Item name"
+                    v-bind="componentField"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField
+              v-slot="{ componentField }"
+              name="amount"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormControl>
+                  <div class="grid gap-2">
+                    <Label for="amount">Amount</Label>
+                    <Input
+                      type="number"
+                      v-bind="componentField"
+                      v-model="itemModel.amount"
+                      placeholder="Enter amount"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </form>
+        </div>
+        <DialogFooter class="flex-row gap-2">
+          <Button
+            class="flex-1"
+            variant="outline"
+            @click="isAddItemDialogOpen = false"
+          >
+            Cancel
+          </Button>
+          <Button class="flex-1" @click="handleAddItem"> Save </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </Card>
 </template>
 
 <script setup lang="ts">
-import type { Category } from "../../../types/category";
-import { defineProps, defineEmits } from "vue";
+import type { Category, CategoryItem } from "../../../types/category";
+import { defineProps, defineEmits, ref, reactive, computed } from "vue";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { Badge } from "../../ui/badge";
 import {
@@ -63,11 +141,56 @@ import {
   ChevronDownIcon,
   PencilSquareIcon,
   TrashIcon,
+  ClipboardDocumentIcon,
 } from "@heroicons/vue/24/outline";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../ui/dialog";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../ui/form";
+import { Input } from "../../ui/input";
+import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
+import { useForm } from "vee-validate";
+import { toTypedSchema } from "@vee-validate/zod";
+import * as z from "zod";
 
+const isPressed = ref<boolean>(false);
 const props = defineProps<{ category: Category }>();
-const emit = defineEmits(['edit', 'delete'])
+const emit = defineEmits(["edit", "delete"]);
+const validationSchema = toTypedSchema(
+  z.object({
+    name: z
+      .string({ message: "Name is required" })
+      .min(1, { message: "Name is required" })
+      .max(50),
+    amount: z.number({ message: "Amount is required" }).min(0).max(100000000),
+  })
+);
+const { isFieldDirty, handleSubmit, setValues } = useForm({ validationSchema });
+const isAddItemDialogOpen = ref(false);
+const itemModel = reactive<CategoryItem>({ id: 0, name: "", amount: 0 });
+const handleAddItem = handleSubmit((values) => {
+  isAddItemDialogOpen.value = false;
+  const item: CategoryItem = {
+    id: Date.now(),
+    name: values.name,
+    amount: values.amount,
+  };
+  props.category.items.push(item);
+});
+const handleCardClick = () => {}
 </script>
 
 <style lang="scss" scoped></style>

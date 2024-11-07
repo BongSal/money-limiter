@@ -9,7 +9,6 @@
     </CardHeader>
 
     <CardContent class="pb-4 flex flex-col" style="height: calc(100vh - 68px)">
-      <!-- Categories Grid -->
       <div class="flex-1">
         <div
           v-if="!categories.length"
@@ -17,7 +16,7 @@
         >
           <div class="text-center w-full text-muted-foreground">
             <div class="inline-block">
-              <Empty />
+              <DocumentMagnifyingGlassIcon class="w-16" />
             </div>
             <p class="text-sm">There are no categories to display right now.</p>
           </div>
@@ -108,9 +107,7 @@
           >
             Cancel
           </Button>
-          <Button class="flex-1" @click="handleEditCategory">
-            Save
-          </Button>
+          <Button class="flex-1" @click="handleEditCategory"> Save </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -174,9 +171,7 @@
           >
             Cancel
           </Button>
-          <Button class="flex-1" @click="handleAddCategory">
-            Save
-          </Button>
+          <Button class="flex-1" @click="handleAddCategory"> Save </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -209,6 +204,7 @@
       </DialogContent>
     </Dialog>
 
+    <!-- Clear all items Dialog -->
     <Dialog :open="isClearDialogOpen" @update:open="isClearDialogOpen = $event">
       <DialogContent class="max-w-[360px] sm:max-w-[360px]">
         <DialogHeader>
@@ -226,7 +222,7 @@
           >
             Cancel
           </Button>
-          <Button class="flex-1" variant="destructive" @click="clearItems">
+          <Button class="flex-1" variant="destructive" @click="clearAllItems">
             Clear
           </Button>
         </DialogFooter>
@@ -236,12 +232,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { Card, CardHeader, CardTitle, CardContent } from "./components/ui/card";
 import { Input } from "./components/ui/input";
 import { Label } from "./components/ui/label";
 import { Button } from "./components/ui/button";
-import { Empty } from "./components/icons/empty";
 import { Category as CardCategory } from "./components/card/category";
 import {
   Dialog,
@@ -257,11 +252,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
-import {
-  ChevronDownIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from "@heroicons/vue/24/outline";
+import { DocumentMagnifyingGlassIcon } from "@heroicons/vue/24/outline";
 import type { Category } from "./types/category";
 import { useCategoryStore } from "./stores/category";
 import { storeToRefs } from "pinia";
@@ -332,8 +323,8 @@ const confirmDelete = () => {
   deleteIndex.value = 0;
 };
 
-const clearItems = () => {
-  categories.value = [];
-  isClearDialogOpen.value = false
+const clearAllItems = () => {
+  categories.value.forEach((item) => (item.items = []));
+  isClearDialogOpen.value = false;
 };
 </script>
