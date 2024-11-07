@@ -9,7 +9,7 @@
     @click="handleCardClick"
   >
     <CardContent class="p-4">
-      <div class="flex justify-between items-center mb-2">
+      <div class="flex justify-between items-center mb-1">
         <span class="text-sm font-medium">{{ category.name }}</span>
         <DropdownMenu>
           <DropdownMenuTrigger as="div" @click.stop>
@@ -32,25 +32,21 @@
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div class="text-xs text-muted-foreground mb-1">
+      <div class="text-xs text-muted-foreground mb-2">
         Limited: {{ category.limit.toLocaleString() }}
       </div>
       <div class="flex justify-between items-center">
         <div class="text-xs">
-          Spent:
-          {{ category.items.reduce((sum, item) => sum + item.amount, 0) }}
+          Available:
+          <Badge
+            v-if="available > 0"
+            variant="destructive"
+            class="bg-green-500 text-white"
+          >
+            {{ available.toLocaleString() }}
+          </Badge>
+          <Badge v-else variant="destructive" class="text-xs"> None </Badge>
         </div>
-        <Badge
-          v-if="
-            category.items.reduce((sum, item) => sum + item.amount, 0) >
-            category.limit
-          "
-          variant="destructive"
-          class="text-xs"
-        >
-          Exceed
-        </Badge>
-        <Badge v-else variant="secondary" class="text-xs"> Active </Badge>
       </div>
     </CardContent>
 
@@ -205,12 +201,16 @@
           </div>
           <div>
             <Label class="text-xs text-gray-600">Available</Label>
-            <Badge variant="outline" class="bg-green-500 text-white text-xs" v-if="available > 0"> 
-              {{ available.toLocaleString() }}
-            </Badge>
-            <Badge variant="destructive" class="text-xs" v-else> 
-              0
-            </Badge>
+            <div>
+              <Badge
+                variant="outline"
+                class="bg-green-500 text-white text-xs"
+                v-if="available > 0"
+              >
+                {{ available.toLocaleString() }}
+              </Badge>
+              <Badge variant="destructive" class="text-xs" v-else> None </Badge>
+            </div>
           </div>
         </div>
 
@@ -379,20 +379,17 @@ const formatTimestamp = (timestamp: number) => {
   }).format(timestamp);
 };
 const totalExpense = computed(() => {
-  return props.category.items.reduce(
-    (sum, item) => sum + item.amount,
-    0
-  );
-})
+  return props.category.items.reduce((sum, item) => sum + item.amount, 0);
+});
 const available = computed(() => {
   const total = props.category.items.reduce(
     (sum, item) => sum + item.amount,
     0
   );
   const leftAmount = props.category.limit - total;
-  if (leftAmount > 0) return leftAmount
-  return 0
-})
+  if (leftAmount > 0) return leftAmount;
+  return 0;
+});
 </script>
 
 <style lang="scss" scoped></style>
