@@ -35,7 +35,6 @@
       </div>
 
       <div class="flex gap-3">
-        <!-- Clear Button -->
         <Button
           variant="destructive"
           class="w-full"
@@ -68,11 +67,7 @@
               <FormItem>
                 <FormControl>
                   <Label for="name">Name</Label>
-                  <Input
-                    v-model="categoryModel.name"
-                    placeholder="Category name"
-                    v-bind="componentField"
-                  />
+                  <Input placeholder="Category name" v-bind="componentField" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -89,7 +84,6 @@
                     <Input
                       type="number"
                       v-bind="componentField"
-                      v-model="categoryModel.limit"
                       placeholder="Enter limit"
                     />
                   </div>
@@ -132,11 +126,7 @@
               <FormItem>
                 <FormControl>
                   <Label for="name">Name</Label>
-                  <Input
-                    v-model="categoryModel.name"
-                    placeholder="Category name"
-                    v-bind="componentField"
-                  />
+                  <Input placeholder="Category name" v-bind="componentField" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -153,7 +143,6 @@
                     <Input
                       type="number"
                       v-bind="componentField"
-                      v-model="categoryModel.limit"
                       placeholder="Enter limit"
                     />
                   </div>

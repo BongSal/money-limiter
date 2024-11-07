@@ -38,11 +38,7 @@
       <div class="flex justify-between items-center">
         <div class="text-xs">
           Available:
-          <Badge
-            v-if="available > 0"
-            variant="destructive"
-            class="bg-green-500 text-white"
-          >
+          <Badge v-if="available > 0" variant="outline">
             {{ available.toLocaleString() }}
           </Badge>
           <Badge v-else variant="destructive" class="text-xs"> None </Badge>
@@ -202,11 +198,7 @@
           <div>
             <Label class="text-xs text-gray-600">Available</Label>
             <div>
-              <Badge
-                variant="outline"
-                class="bg-green-500 text-white text-xs"
-                v-if="available > 0"
-              >
+              <Badge variant="outline" class="text-xs" v-if="available > 0">
                 {{ available.toLocaleString() }}
               </Badge>
               <Badge variant="destructive" class="text-xs" v-else> None </Badge>
@@ -225,7 +217,8 @@
             <p class="text-sm">There are no items to display right now.</p>
           </div>
         </div>
-        <div class="py-4 flex flex-col gap-2" v-else>
+        <div class="py-4 flex flex-col gap-2 max-h-96 overflow-auto" v-else>
+          <Label class="text-gray-600">Items</Label>
           <Card
             v-for="item in category.items"
             :key="item.id"
