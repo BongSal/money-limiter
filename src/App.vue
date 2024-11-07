@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div class="flex gap-3">
+      <div class="flex gap-3 mt-2">
         <Button
           variant="destructive"
           class="w-full"
