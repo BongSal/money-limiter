@@ -369,6 +369,9 @@ const formatTimestamp = (timestamp: number) => {
     month: "short",
     day: "numeric",
     year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
   }).format(timestamp);
 };
 const totalExpense = computed(() => {

@@ -6,7 +6,7 @@ export const useCategoryStore = defineStore("category", () => {
   const categories = ref<Array<Category>>(
     JSON.parse(localStorage.getItem("categories") || "[]")
   );
-  const create = (category: Category) => {
+  const create = (category: Partial<Category>) => {
     category.id = Date.now();
     categories.value.push(JSON.parse(JSON.stringify(category)));
   };

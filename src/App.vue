@@ -5,7 +5,7 @@
       class="flex flex-row items-center justify-between space-y-0 pb-4"
     >
       <CardTitle class="text-lg font-medium">Money Limiter</CardTitle>
-      <span class="text-sm text-muted-foreground">Dec 12, 2024</span>
+      <span class="text-sm text-muted-foreground">{{ currentDate() }}</span>
     </CardHeader>
 
     <CardContent class="pb-4 flex flex-col" style="height: calc(100vh - 68px)">
@@ -199,8 +199,8 @@
         <DialogHeader>
           <DialogTitle>Clear all items</DialogTitle>
           <DialogDescription>
-            Are you sure you want to clear all items? This action cannot be
-            undone.
+            Are you sure you want to clear all items in each category? This
+            action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter class="flex-row gap-2">
@@ -278,8 +278,12 @@ const categoryModel = reactive<Category>({
   limit: 0,
   items: [],
 });
-const handleAddCategory = handleSubmit(() => {
-  create(categoryModel);
+const handleAddCategory = handleSubmit((values) => {
+  const category: Partial<Category> = {
+    ...values,
+    items: [],
+  }
+  create(category);
   isAddDialogOpen.value = false;
 });
 
@@ -315,5 +319,16 @@ const confirmDelete = () => {
 const clearAllItems = () => {
   categories.value.forEach((item) => (item.items = []));
   isClearDialogOpen.value = false;
+};
+const currentDate = () => {
+  const today = new Date();
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  }).format(today);
 };
 </script>
