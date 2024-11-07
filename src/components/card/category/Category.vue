@@ -331,6 +331,9 @@ const handleEditItem = handleSubmit((values) => {
 const handleDeleteItem = () => {
   isEditItemDialogOpen.value = false;
   isItemsListDialogOpen.value = true;
+  props.category.items = props.category.items.filter(
+    (item) => item.id !== selectedItem.id
+  );
 };
 
 const isItemsListDialogOpen = ref(false);
