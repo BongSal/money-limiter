@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+    <!-- Background -->
+    <circle cx="64" cy="64" r="60" fill="#f0f9ff"/>
+    
+    <!-- Wallet base -->
+    <rect x="24" y="44" width="80" height="56" rx="8" fill="#2563eb"/>
+    
+    <!-- Wallet flap -->
+    <path d="M24 52 L104 52 L104 88 Q104 96 96 96 L32 96 Q24 96 24 88 Z" fill="#1d4ed8"/>
+    
+    <!-- Graph bars -->
+    <rect x="40" y="64" width="8" height="20" fill="#22c55e"/>
+    <rect x="52" y="60" width="8" height="24" fill="#16a34a"/>
+    <rect x="64" y="68" width="8" height="16" fill="#22c55e"/>
+    <rect x="76" y="56" width="8" height="28" fill="#16a34a"/>
+    
+    <!-- Limit line -->
+    <line x1="36" y1="72" x2="88" y2="72" stroke="#fcd34d" stroke-width="2" stroke-dasharray="4"/>
+    
+    <!-- Dollar symbol -->
+    <text x="64" y="40" font-family="Arial, sans-serif" font-size="24" fill="#0f172a" text-anchor="middle" font-weight="bold">$</text>
+    
+    <!-- Shine effect -->
+    <path d="M30 44 Q64 36 98 44" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.3"/>
+</svg>
