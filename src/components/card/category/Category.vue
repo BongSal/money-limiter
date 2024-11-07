@@ -37,7 +37,7 @@
         </DropdownMenu>
       </div>
       <div class="text-xs text-muted-foreground mb-1">
-        Limited: {{ category.limit }}
+        Limited: {{ category.limit.toLocaleString() }}
       </div>
       <div class="flex justify-between items-center">
         <div class="text-xs">
@@ -123,12 +123,61 @@
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <Dialog
+      :open="isItemsListDialogOpen"
+      @update:open="isItemsListDialogOpen = $event"
+    >
+      <DialogContent class="max-w-[360px] sm:max-w-[360px]">
+        <DialogHeader>
+          <DialogTitle> Items for {{ category.name }} </DialogTitle>
+          <DialogDescription>
+            The Category feature is used to manage daily expenses and item
+            spending effectively.
+          </DialogDescription>
+        </DialogHeader>
+        <div class="py-4 flex flex-col gap-2">
+          <Card
+            v-for="item in category.items"
+            :key="item.id"
+            class="hover:bg-gray-50 cursor-pointer"
+          >
+            <CardContent class="p-4 py-2">
+              <div class="flex items-center justify-between">
+                <div class="space-y-1">
+                  <h3 class="font-medium">{{ item.name }}</h3>
+                  <p class="text-sm text-gray-500">
+                    {{ formatTimestamp(item.id) }}
+                  </p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="font-medium">
+                    {{ item.amount.toLocaleString() }}
+                  </span>
+                  <ChevronRightIcon class="h-4 w-4 text-gray-400" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <DialogFooter class="flex-row gap-2">
+          <Button
+            class="flex-1"
+            variant="outline"
+            @click="isItemsListDialogOpen = false"
+          >
+            Close
+          </Button>
+          <Button class="flex-1" @click="handleSaveItemsList"> Save </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </Card>
 </template>
 
 <script setup lang="ts">
 import type { Category, CategoryItem } from "../../../types/category";
-import { defineProps, defineEmits, ref, reactive, computed } from "vue";
+import { defineProps, defineEmits, ref, reactive } from "vue";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { Badge } from "../../ui/badge";
 import {
@@ -142,6 +191,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
   ClipboardDocumentIcon,
+  ChevronRightIcon,
 } from "@heroicons/vue/24/outline";
 import {
   Dialog,
@@ -190,7 +240,19 @@ const handleAddItem = handleSubmit((values) => {
   };
   props.category.items.push(item);
 });
-const handleCardClick = () => {}
+
+const isItemsListDialogOpen = ref(false);
+const handleCardClick = () => {
+  isItemsListDialogOpen.value = true;
+};
+const handleSaveItemsList = () => {};
+const formatTimestamp = (timestamp: number) => {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(timestamp);
+};
 </script>
 
 <style lang="scss" scoped></style>
