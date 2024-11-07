@@ -37,8 +37,9 @@ export const useCategoryStore = defineStore("category", () => {
       "Household Supplies",
       "Miscellaneous",
     ];
+    let increment: number = 0
     const defaultCategories: Array<Category> = expenseCategories.map((item) => ({
-      id: Date.now(),
+      id: Date.now() + (increment++),
       name: item,
       items: [],
       limit: 10000,
