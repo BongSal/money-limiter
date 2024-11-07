@@ -12,16 +12,12 @@
       <div class="flex justify-between items-center mb-2">
         <span class="text-sm font-medium">{{ category.name }}</span>
         <DropdownMenu>
-          <DropdownMenuTrigger as="div">
+          <DropdownMenuTrigger as="div" @click.stop>
             <Button variant="ghost" size="icon" class="h-6 w-6">
               <ChevronDownIcon class="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem @click="isAddItemDialogOpen = true">
-              <ClipboardDocumentIcon class="w-4 h-4 mr-2" />
-              Add Item
-            </DropdownMenuItem>
             <DropdownMenuItem @click="$emit('edit', category)">
               <PencilSquareIcon class="w-4 h-4 mr-2" />
               Edit
@@ -115,11 +111,77 @@
           <Button
             class="flex-1"
             variant="outline"
-            @click="isAddItemDialogOpen = false"
+            @click="
+              () => {
+                isAddItemDialogOpen = false;
+                isItemsListDialogOpen = true;
+              }
+            "
           >
             Cancel
           </Button>
           <Button class="flex-1" @click="handleAddItem"> Save </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog
+      :open="isEditItemDialogOpen"
+      @update:open="isEditItemDialogOpen = $event"
+    >
+      <DialogContent class="max-w-[360px] sm:max-w-[360px]">
+        <DialogHeader>
+          <DialogTitle> Edit item of {{ category.name }} </DialogTitle>
+          <DialogDescription>
+            The Category feature is used to manage daily expenses and item
+            spending effectively.
+          </DialogDescription>
+        </DialogHeader>
+        <div class="py-4">
+          <form @submit="handleAddItem" class="grid gap-4">
+            <FormField
+              v-slot="{ componentField }"
+              name="name"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormControl>
+                  <Label for="name">Name</Label>
+                  <Input placeholder="Item name" v-bind="componentField" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField
+              v-slot="{ componentField }"
+              name="amount"
+              :validate-on-blur="!isFieldDirty"
+            >
+              <FormItem>
+                <FormControl>
+                  <div class="grid gap-2">
+                    <Label for="amount">Amount</Label>
+                    <Input
+                      type="number"
+                      v-bind="componentField"
+                      placeholder="Enter amount"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </form>
+        </div>
+        <DialogFooter class="flex-row gap-2">
+          <Button
+            class="flex-1"
+            variant="destructive"
+            @click="handleDeleteItem"
+          >
+            Delete
+          </Button>
+          <Button class="flex-1" @click="handleEditItem"> Save </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -130,7 +192,7 @@
     >
       <DialogContent class="max-w-[360px] sm:max-w-[360px]">
         <DialogHeader>
-          <DialogTitle> Items for {{ category.name }} </DialogTitle>
+          <DialogTitle>{{ category.name }} </DialogTitle>
           <DialogDescription>
             The Category feature is used to manage daily expenses and item
             spending effectively.
@@ -141,6 +203,7 @@
             v-for="item in category.items"
             :key="item.id"
             class="hover:bg-gray-50 cursor-pointer"
+            @click="handleEditItemClick(item)"
           >
             <CardContent class="p-4 py-2">
               <div class="flex items-center justify-between">
@@ -161,14 +224,12 @@
           </Card>
         </div>
         <DialogFooter class="flex-row gap-2">
-          <Button
-            class="flex-1"
-            variant="outline"
-            @click="isItemsListDialogOpen = false"
-          >
-            Close
+          <Button class="flex-1" variant="outline" @click="handleAddItemClick">
+            Add Item
           </Button>
-          <Button class="flex-1" @click="handleSaveItemsList"> Save </Button>
+          <Button class="flex-1" @click="isItemsListDialogOpen = false">
+            OK
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -225,27 +286,61 @@ const validationSchema = toTypedSchema(
       .string({ message: "Name is required" })
       .min(1, { message: "Name is required" })
       .max(50),
-    amount: z.number({ message: "Amount is required" }).min(0).max(100000000),
+    amount: z
+      .number({ message: "Amount is required" })
+      .min(1, { message: "Amount is required" })
+      .max(100000000),
   })
 );
 const { isFieldDirty, handleSubmit, setValues } = useForm({ validationSchema });
 const isAddItemDialogOpen = ref(false);
 const itemModel = reactive<CategoryItem>({ id: 0, name: "", amount: 0 });
 const handleAddItem = handleSubmit((values) => {
-  isAddItemDialogOpen.value = false;
   const item: CategoryItem = {
     id: Date.now(),
     name: values.name,
     amount: values.amount,
   };
   props.category.items.push(item);
+  isAddItemDialogOpen.value = false;
+  isItemsListDialogOpen.value = true;
 });
+
+const isEditItemDialogOpen = ref(false);
+const selectedItem = reactive<Partial<CategoryItem>>({});
+const handleEditItemClick = (item: CategoryItem) => {
+  Object.assign(selectedItem, item);
+  setValues({ name: item.name, amount: item.amount });
+  isItemsListDialogOpen.value = false;
+  isEditItemDialogOpen.value = true;
+};
+const handleEditItem = handleSubmit((values) => {
+  const itemIndex = props.category.items.findIndex(
+    (item) => item.id === selectedItem.id
+  );
+  if (itemIndex !== -1) {
+    props.category.items[itemIndex] = {
+      ...props.category.items[itemIndex],
+      ...values,
+    };
+  }
+
+  isItemsListDialogOpen.value = true;
+  isEditItemDialogOpen.value = false;
+});
+const handleDeleteItem = () => {
+  isEditItemDialogOpen.value = false;
+  isItemsListDialogOpen.value = true;
+};
 
 const isItemsListDialogOpen = ref(false);
 const handleCardClick = () => {
   isItemsListDialogOpen.value = true;
 };
-const handleSaveItemsList = () => {};
+const handleAddItemClick = () => {
+  isItemsListDialogOpen.value = false;
+  isAddItemDialogOpen.value = true;
+};
 const formatTimestamp = (timestamp: number) => {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
