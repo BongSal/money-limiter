@@ -198,7 +198,18 @@
             spending effectively.
           </DialogDescription>
         </DialogHeader>
-        <div class="py-4 flex flex-col gap-2">
+        <div
+          v-if="!category.items.length"
+          class="flex h-48 text-center justify-center items-center"
+        >
+          <div class="text-center w-full text-muted-foreground">
+            <div class="inline-block">
+              <DocumentMagnifyingGlassIcon class="w-16" />
+            </div>
+            <p class="text-sm">There are no items to display right now.</p>
+          </div>
+        </div>
+        <div class="py-4 flex flex-col gap-2" v-else>
           <Card
             v-for="item in category.items"
             :key="item.id"
@@ -253,6 +264,7 @@ import {
   TrashIcon,
   ClipboardDocumentIcon,
   ChevronRightIcon,
+  DocumentMagnifyingGlassIcon,
 } from "@heroicons/vue/24/outline";
 import {
   Dialog,
