@@ -258,7 +258,7 @@
 
 <script setup lang="ts">
 import type { Category, CategoryItem } from "../../../types/category";
-import { defineProps, defineEmits, ref, reactive, computed } from "vue";
+import { ref, reactive, computed } from "vue";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { Badge } from "../../ui/badge";
 import {

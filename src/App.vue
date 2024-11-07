@@ -29,16 +29,24 @@
             </Button>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-3 mb-6" v-else>
-          <CardCategory
-            v-for="(category, index) in categories"
-            :key="index"
-            @edit="handleEditCategoryClick"
-            @delete="deleteCategory"
-            :category="category"
-            variant="outline"
-            class="border rounded-xl"
-          />
+        <div v-else>
+          <draggable
+            v-model="categories"
+            @end="onEnd"
+            class="grid grid-cols-2 gap-3"
+            item-key="id"
+          >
+            <template #item="{ element, index }">
+              <CardCategory
+                :key="index"
+                @edit="handleEditCategoryClick"
+                @delete="deleteCategory"
+                :category="element"
+                variant="outline"
+                class="border rounded-xl"
+              />
+            </template>
+          </draggable>
         </div>
       </div>
 
@@ -261,6 +269,7 @@ import {
   FormLabel,
   FormMessage,
 } from "./components/ui/form";
+import Draggable from "vuedraggable";
 
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
@@ -339,4 +348,5 @@ const currentDate = () => {
     hour12: true,
   }).format(today);
 };
+const onEnd = () => {};
 </script>
