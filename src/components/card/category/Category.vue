@@ -76,11 +76,7 @@
               <FormItem>
                 <FormControl>
                   <Label for="name">Name</Label>
-                  <Input
-                    v-model="itemModel.name"
-                    placeholder="Item name"
-                    v-bind="componentField"
-                  />
+                  <Input placeholder="Item name" v-bind="componentField" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,7 +93,6 @@
                     <Input
                       type="number"
                       v-bind="componentField"
-                      v-model="itemModel.amount"
                       placeholder="Enter amount"
                     />
                   </div>
@@ -192,12 +187,33 @@
     >
       <DialogContent class="max-w-[360px] sm:max-w-[360px]">
         <DialogHeader>
-          <DialogTitle>{{ category.name }} </DialogTitle>
+          <DialogTitle>{{ category.name }}</DialogTitle>
           <DialogDescription>
             The Category feature is used to manage daily expenses and item
             spending effectively.
           </DialogDescription>
         </DialogHeader>
+
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <Label class="text-xs text-gray-600">Limited</Label>
+            <p class="font-semibold">{{ category.limit.toLocaleString() }}</p>
+          </div>
+          <div>
+            <Label class="text-xs text-gray-600">Expense</Label>
+            <p class="font-semibold">{{ totalExpense.toLocaleString() }}</p>
+          </div>
+          <div>
+            <Label class="text-xs text-gray-600">Available</Label>
+            <Badge variant="outline" class="bg-green-500 text-white text-xs" v-if="available > 0"> 
+              {{ available.toLocaleString() }}
+            </Badge>
+            <Badge variant="destructive" class="text-xs" v-else> 
+              0
+            </Badge>
+          </div>
+        </div>
+
         <div
           v-if="!category.items.length"
           class="flex h-48 text-center justify-center items-center"
@@ -249,7 +265,7 @@
 
 <script setup lang="ts">
 import type { Category, CategoryItem } from "../../../types/category";
-import { defineProps, defineEmits, ref, reactive } from "vue";
+import { defineProps, defineEmits, ref, reactive, computed } from "vue";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { Badge } from "../../ui/badge";
 import {
@@ -306,7 +322,6 @@ const validationSchema = toTypedSchema(
 );
 const { isFieldDirty, handleSubmit, setValues } = useForm({ validationSchema });
 const isAddItemDialogOpen = ref(false);
-const itemModel = reactive<CategoryItem>({ id: 0, name: "", amount: 0 });
 const handleAddItem = handleSubmit((values) => {
   const item: CategoryItem = {
     id: Date.now(),
@@ -363,6 +378,21 @@ const formatTimestamp = (timestamp: number) => {
     year: "numeric",
   }).format(timestamp);
 };
+const totalExpense = computed(() => {
+  return props.category.items.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+})
+const available = computed(() => {
+  const total = props.category.items.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+  const leftAmount = props.category.limit - total;
+  if (leftAmount > 0) return leftAmount
+  return 0
+})
 </script>
 
 <style lang="scss" scoped></style>
