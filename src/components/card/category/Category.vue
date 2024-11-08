@@ -3,14 +3,20 @@
     variant="outline"
     class="border rounded-xl transition duration-200 transform hover:cursor-pointer"
     @mousedown="isPressed = true"
-    :class="{ 'scale-95': isPressed }"
+    :class="[scaleDown]"
     @mouseup="isPressed = false"
     @mouseleave="isPressed = false"
     @click="handleCardClick"
+    @touchstart="isPressed = true"
+    @touchend="isPressed = false"
+    @touchmove="isPressed = false"
   >
     <CardContent class="p-4">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-sm font-medium">{{ category.name }}</span>
+        <span
+          class="text-sm font-medium overflow-ellipsis whitespace-nowrap overflow-hidden"
+          >{{ category.name }}</span
+        >
         <DropdownMenu>
           <DropdownMenuTrigger as="div" @click.stop>
             <Button variant="ghost" size="icon" class="h-6 w-6">
@@ -244,12 +250,14 @@
           </Card>
         </div>
         <DialogFooter class="flex-row gap-2">
-          <Button class="flex-1" variant="outline" @click="handleAddItemClick">
-            Add Item
+          <Button
+            class="flex-1"
+            variant="outline"
+            @click="isItemsListDialogOpen = false"
+          >
+            Close
           </Button>
-          <Button class="flex-1" @click="isItemsListDialogOpen = false">
-            OK
-          </Button>
+          <Button class="flex-1" @click="handleAddItemClick"> Add Item </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -299,6 +307,7 @@ import { toTypedSchema } from "@vee-validate/zod";
 import * as z from "zod";
 
 const isPressed = ref<boolean>(false);
+const scaleDown = computed(() => (isPressed.value ? "scale-95" : ""));
 const props = defineProps<{ category: Category }>();
 const emit = defineEmits(["edit", "delete"]);
 const validationSchema = toTypedSchema(

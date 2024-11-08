@@ -8,10 +8,32 @@
       <span class="text-sm text-muted-foreground">{{ currentDate() }}</span>
     </CardHeader>
 
-    <CardContent class="pb-4 flex flex-col" style="height: calc(100dvh - 68px)">
+    <CardContent class="px-4 pb-4">
+      <Card>
+        <CardContent class="grid grid-cols-3 gap-4 text-center py-4">
+          <div>
+            <Label class="text-xs text-gray-600">Total Limited</Label>
+            <p class="font-semibold">{{ totalLimited.toLocaleString() }}</p>
+          </div>
+          <div>
+            <Label class="text-xs text-gray-600">Total Expense</Label>
+            <p class="font-semibold">{{ totalExpense.toLocaleString() }}</p>
+          </div>
+          <div>
+            <Label class="text-xs text-gray-600">Total Available</Label>
+            <p class="font-semibold">{{ totalAvailable.toLocaleString() }}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </CardContent>
+
+    <CardContent
+      class="pb-4 flex flex-col px-4"
+      style="height: calc(100dvh - (68px + 106px))"
+    >
       <div
         class="flex-1 overflow-auto"
-        style="height: calc(100dvh - (68px + 36px))"
+        style="height: calc(100dvh - (68px + 36px + 106px))"
       >
         <div
           v-if="!categories.length"
@@ -259,7 +281,7 @@ import {
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
 import { DocumentMagnifyingGlassIcon } from "@heroicons/vue/24/outline";
-import type { Category } from "./types/category";
+import type { Category, CategoryItem } from "./types/category";
 import { useCategoryStore } from "./stores/category";
 import { storeToRefs } from "pinia";
 import {
@@ -349,4 +371,25 @@ const currentDate = () => {
     hour12: true,
   }).format(today);
 };
+const totalLimited = computed(() =>
+  categories.value.reduce((sum, item) => sum + item.limit, 0)
+);
+const totalExpense = computed(() =>
+  categories.value.reduce(
+    (sum, category) =>
+      sum +
+      category.items.reduce(
+        (count: number, item: CategoryItem) => count + item.amount,
+        0
+      ),
+    0
+  )
+);
+const totalAvailable = computed(() => {
+  const available = totalLimited.value - totalExpense.value;
+  if (available > 0) {
+    return available;
+  }
+  return 0;
+});
 </script>
