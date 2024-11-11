@@ -1,5 +1,5 @@
 <template>
-  <Card class="max-w-lg mx-auto border-none shadow-none touch-none">
+  <Card class="max-w-lg mx-auto border-none shadow-none select-none">
     <!-- Header -->
     <CardHeader
       class="flex flex-row items-center justify-between space-y-0 pb-4"
