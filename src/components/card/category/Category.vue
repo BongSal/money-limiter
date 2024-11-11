@@ -50,8 +50,8 @@
           <Badge v-if="available > 0" variant="outline">
             {{ available.toLocaleString() }}
           </Badge>
-          <Badge v-else variant="destructive" class="text-xs">
-            {{ available }}
+          <Badge v-else variant="destructive">
+            {{ available.toLocaleString() }}
           </Badge>
         </div>
       </div>
