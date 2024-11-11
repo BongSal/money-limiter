@@ -41,13 +41,18 @@
       <div class="text-xs text-muted-foreground mb-2">
         Limited: {{ category.limit.toLocaleString() }}
       </div>
+      <div class="text-xs text-muted-foreground mb-2">
+        Total Items: {{ category.items.length }}
+      </div>
       <div class="flex justify-between items-center">
         <div class="text-xs">
           Available:
           <Badge v-if="available > 0" variant="outline">
             {{ available.toLocaleString() }}
           </Badge>
-          <Badge v-else variant="destructive" class="text-xs"> None </Badge>
+          <Badge v-else variant="destructive" class="text-xs">
+            {{ available }}
+          </Badge>
         </div>
       </div>
     </CardContent>
@@ -207,7 +212,9 @@
               <Badge variant="outline" class="text-xs" v-if="available > 0">
                 {{ available.toLocaleString() }}
               </Badge>
-              <Badge variant="destructive" class="text-xs" v-else> None </Badge>
+              <Badge variant="destructive" class="text-xs" v-else>
+                {{ available }}
+              </Badge>
             </div>
           </div>
         </div>
@@ -235,7 +242,7 @@
               <div class="flex items-center justify-between">
                 <div class="space-y-1">
                   <h3 class="font-medium">{{ item.name }}</h3>
-                  <p class="text-sm text-gray-500">
+                  <p class="text-xs text-gray-500">
                     {{ formatTimestamp(item.id) }}
                   </p>
                 </div>
@@ -279,7 +286,6 @@ import {
   ChevronDownIcon,
   PencilSquareIcon,
   TrashIcon,
-  ClipboardDocumentIcon,
   ChevronRightIcon,
   DocumentMagnifyingGlassIcon,
 } from "@heroicons/vue/24/outline";
@@ -293,10 +299,8 @@ import {
 } from "../../ui/dialog";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "../../ui/form";
 import { Input } from "../../ui/input";
@@ -391,9 +395,7 @@ const available = computed(() => {
     (sum, item) => sum + item.amount,
     0
   );
-  const leftAmount = props.category.limit - total;
-  if (leftAmount > 0) return leftAmount;
-  return 0;
+  return props.category.limit - total;
 });
 </script>
 

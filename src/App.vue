@@ -21,7 +21,12 @@
           </div>
           <div>
             <Label class="text-xs text-gray-600">Total Available</Label>
-            <p class="font-semibold">{{ totalAvailable.toLocaleString() }}</p>
+            <p
+              class="font-semibold"
+              :class="{ 'text-red-600': totalAvailable < 0 }"
+            >
+              {{ totalAvailable.toLocaleString() }}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -385,11 +390,5 @@ const totalExpense = computed(() =>
     0
   )
 );
-const totalAvailable = computed(() => {
-  const available = totalLimited.value - totalExpense.value;
-  if (available > 0) {
-    return available;
-  }
-  return 0;
-});
+const totalAvailable = computed(() => totalLimited.value - totalExpense.value);
 </script>
