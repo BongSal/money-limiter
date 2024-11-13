@@ -9,7 +9,17 @@
     </CardHeader>
 
     <CardContent class="px-4 pb-4">
-      <Card>
+      <Card
+        @mousedown="isDashboardPressed = true"
+        :class="[scaleDashboardDown]"
+        @mouseup="isDashboardPressed = false"
+        @mouseleave="isDashboardPressed = false"
+        @touchstart="isDashboardPressed = true"
+        @touchend="isDashboardPressed = false"
+        @touchmove="isDashboardPressed = false"
+        @click="isDashboardDialogOpen = true"
+        class="cursor-pointer transition duration-200 transform"
+      >
         <CardContent class="grid grid-cols-3 gap-4 text-center py-4">
           <div>
             <Label class="text-xs text-gray-600">Total Limited</Label>
@@ -57,7 +67,7 @@
           </div>
         </div>
         <div v-else>
-          <draggable
+          <Draggable
             v-model="categories"
             :delay="200"
             :delay-on-touch-only="true"
@@ -74,7 +84,7 @@
                 class="border rounded-xl"
               />
             </template>
-          </draggable>
+          </Draggable>
         </div>
       </div>
 
@@ -261,6 +271,60 @@
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <!-- Dashboard Dialog -->
+    <Dialog
+      :open="isDashboardDialogOpen"
+      @update:open="isDashboardDialogOpen = $event"
+    >
+      <DialogContent class="max-w-[360px] sm:max-w-[360px]">
+        <DialogHeader>
+          <DialogTitle>Dashboard</DialogTitle>
+          <DialogDescription>
+            Dashboard displays all information related to all items the app.
+          </DialogDescription>
+        </DialogHeader>
+        <div
+          v-if="!dashboardItems.length"
+          class="flex h-48 text-center justify-center items-center"
+        >
+          <div class="text-center w-full text-muted-foreground">
+            <div class="inline-block">
+              <DocumentMagnifyingGlassIcon class="w-16" />
+            </div>
+            <p class="text-sm">There are no items to display right now.</p>
+          </div>
+        </div>
+        <div class="py-4 flex flex-col gap-2 max-h-96 overflow-auto" v-else>
+          <Card v-for="item in dashboardItems" :key="item.id">
+            <CardContent class="p-4 py-2">
+              <div class="flex items-center justify-between">
+                <div class="space-y-1">
+                  <h3 class="text-sm">{{ item.name }}</h3>
+                  <p class="text-xs text-gray-500">
+                    {{ formatTimestamp(item.id) }}
+                  </p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span>
+                    {{ item.amount.toLocaleString() }}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <DialogFooter>
+          <Button
+            class="flex-1"
+            variant="outline"
+            @click="isDashboardDialogOpen = false"
+          >
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </Card>
 </template>
 
@@ -279,22 +343,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./components/ui/dropdown-menu";
 import { DocumentMagnifyingGlassIcon } from "@heroicons/vue/24/outline";
 import type { Category, CategoryItem } from "./types/category";
 import { useCategoryStore } from "./stores/category";
 import { storeToRefs } from "pinia";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "./components/ui/form";
 import Draggable from "vuedraggable";
@@ -391,4 +447,25 @@ const totalExpense = computed(() =>
   )
 );
 const totalAvailable = computed(() => totalLimited.value - totalExpense.value);
+
+const isDashboardDialogOpen = ref(false);
+const isDashboardPressed = ref(false);
+const dashboardItems = computed(() =>
+  categories.value
+    .flatMap((category) => category.items)
+    .sort((a, b) => b.id - a.id)
+);
+const scaleDashboardDown = computed(() =>
+  isDashboardPressed.value ? "scale-95" : ""
+);
+const formatTimestamp = (timestamp: number) => {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  }).format(timestamp);
+};
 </script>

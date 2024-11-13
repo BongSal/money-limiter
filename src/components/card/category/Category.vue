@@ -231,9 +231,8 @@
           </div>
         </div>
         <div class="py-4 flex flex-col gap-2 max-h-96 overflow-auto" v-else>
-          <Label class="text-gray-600">Items</Label>
           <Card
-            v-for="item in category.items"
+            v-for="item in category.items.sort((a, b) => b.id - a.id)"
             :key="item.id"
             class="hover:bg-gray-50 cursor-pointer"
             @click="handleEditItemClick(item)"
@@ -247,7 +246,7 @@
                   </p>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <span class="font-medium">
+                  <span>
                     {{ item.amount.toLocaleString() }}
                   </span>
                   <ChevronRightIcon class="h-4 w-4 text-gray-400" />
@@ -274,7 +273,7 @@
 <script setup lang="ts">
 import type { Category, CategoryItem } from "../../../types/category";
 import { ref, reactive, computed } from "vue";
-import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
+import { Card, CardContent } from "../../ui/card";
 import { Badge } from "../../ui/badge";
 import {
   DropdownMenu,
@@ -297,12 +296,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../ui/dialog";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "../../ui/form";
+import { FormControl, FormField, FormItem, FormMessage } from "../../ui/form";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import { Button } from "../../ui/button";
